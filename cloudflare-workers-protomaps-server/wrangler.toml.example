@@ -1,4 +1,4 @@
-name = "pmtiles-cloudflare"
+name = "protomaps-on-cloudflare"
 main = "src/index.ts"
 compatibility_date = "2022-10-18"
 minify = false
