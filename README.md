@@ -1,83 +1,29 @@
-[![npm](https://img.shields.io/npm/v/pmtiles)](https://www.npmjs.com/package/pmtiles)
-[![pypi](https://img.shields.io/pypi/v/pmtiles)](https://pypi.org/project/pmtiles/)
+# Protomaps on Cloudflare
 
-🔎 **PMTiles Viewer:** [https://pmtiles.io/](https://pmtiles.io) 🔎
+This is a sample project to demonstrate how to host Protomaps on Cloudflare.
 
-# PMTiles
+## How it works 
 
-PMTiles is a single-file archive format for tiled data. A PMTiles archive can be hosted on a commodity storage platform such as S3, and enables low-cost, zero-maintenance map applications that are "serverless" - free of a custom tile backend or third party provider.
+This project is made up of 3 parts:
 
-* [Protomaps Blog: Dynamic Maps, Static Storage](http://protomaps.com/blog/dynamic-maps-static-storage)
+1. A Cloudflare Worker that serves the PMTiles files using the x/y/z format. 
+2. A Cloudflare R2 bucket to store the PMTiles
+3. A React application that fetches the map information in x/y/z format served by the Cloudflare Worker and displays them.
 
-* [PMTiles Viewer](https://pmtiles.io) - inspect and preview PMTiles local or remote PMTiles archives.
-    * Archives on cloud storage may require CORS for the origin `https://protomaps.github.io`
+## A brief explainer
 
-* [Vector Tiles Example (US Zip Codes)](https://pmtiles.io/?url=https%3A%2F%2Fr2-public.protomaps.com%2Fprotomaps-sample-datasets%2Fcb_2018_us_zcta510_500k.pmtiles)
+Serving maps is a complex problem, and traditionally requires hosting large amounts of files and serving them which comes with its set of challenges.
 
+PMTiles is a new method of storing and serving files, which requires only a single-file. Then, a server can use Http Range Requests to fetch only the relevant tile data that is requested by the map. 
 
-Demos require MapLibre GL JS v1.15 or later.
+It is possible to use a static PMTiles file as the source for the map and have them served from a server that supports Http Range Requests (such as an Express.js server). However, most static site hosts (such as Cloudflare Pages) have file size limitations and do not support Http Range Requests. (See more on the [deployment options in the Protomaps docs](https://docs.protomaps.com/deploy/#deployment-comparison-chart)).
 
-See also:
-* [Cloud Optimized GeoTIFFs](https://www.cogeo.org)
+Therefore, to host on Cloudflare, we'll use the [Cloudflare Workers project that is provided by the Protomaps organization](https://github.com/protomaps/PMTiles/tree/main/serverless/cloudflare). This project is a Cloudflare Worker that serves the PMTiles files using the x/y/z format. Doing so is also performant and cost efficient (see the explanation in the [Protomaps docs](https://docs.protomaps.com/deploy/)).
 
-## Creating PMTiles
+## How the Cloudflare Worker works:
 
-Download the `pmtiles` binary for your system at [go-pmtiles/Releases](https://github.com/protomaps/go-pmtiles/releases).
+The Cloudflare Worker code in this repository is copied from the original [PMTiles repository](https://github.com/protomaps/PMTiles/tree/main/serverless/cloudflare). It parses the request in x/y/z format, fetches the required information from R2, caches the response, and returns it to the client.
 
-    pmtiles convert INPUT.mbtiles OUTPUT.pmtiles
-    pmtiles upload OUTPUT.pmtiles s3://my-bucket?region=us-west-2 // requires AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY env vars to be set
+## How the React application works:
 
-## Consuming PMTiles
-
-### JavaScript
-
-See [js/README.md](js/README.md) and [js/examples](js/examples) for usage in Leaflet or MapLibre GL JS.
-
-See [openlayers/README.md](openlayers/README.md) for usage in OpenLayers.
-
-### Go
-
-See the [go-pmtiles](https://github.com/protomaps/go-pmtiles) repository.
-
-### Python
-
-See https://github.com/protomaps/PMTiles/tree/main/python/bin for library usage
-
-### Serverless
-
-[PMTiles on AWS Lambda](https://github.com/protomaps/PMTiles/tree/main/serverless/aws)
-
-[PMTiles on Cloudflare Workers](https://github.com/protomaps/PMTiles/tree/main/serverless/cloudflare)
-
-## Specification
-
-The current specification version is [Version 3](./spec/v3/spec.md).
-
-## Recipes
-
-Example of how to create a PMTiles archive from the [Census Bureau Zip Code Tabulation Areas Shapefile](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html) using [tippecanoe](https://github.com/felt/tippecanoe):
-
-```sh
-    # use GDAL/OGR to convert SHP to GeoJSON
-    ogr2ogr -t_srs EPSG:4326 cb_2018_us_zcta510_500k.json cb_2018_us_zcta510_500k.shp
-    # Creates a layer in the vector tiles named "zcta"
-    tippecanoe -zg --projection=EPSG:4326 -o cb_2018_us_zcta510_500k_nolimit.pmtiles -l zcta cb_2018_us_zcta510_500k.json
-```
-
-### Uploading to Storage
-
-Using the [PMTiles command line tool](http://github.com/protomaps/go-pmtiles):
-
-```sh
-pmtiles upload LOCAL.pmtiles "s3://BUCKET_NAME?endpoint=https://example.com&region=region" REMOTE.pmtiles
-```
-
-Using [RClone](https://rclone.org) (do `rclone config` first)
-
-```sh
-rclone copyto LOCAL.pmtiles r2:/BUCKET/REMOTE.pmtiles --progress --s3-chunk-size=256M --s3-upload-concurrency=2
-```
-
-## License
-
-The reference implementations of PMTiles are published under the BSD 3-Clause License. The PMTiles specification itself is public domain, or under a CC0 license where applicable.
+The React application uses [React Map GL](https://visgl.github.io/react-map-gl/) and [MapLibre GL JS](https://maplibre.org/maplibre-gl-js-docs/api/) to display the PMTiles files. It makes requests in x/y/z format to the Cloudflare Worker.
