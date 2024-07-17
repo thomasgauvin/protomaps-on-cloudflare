@@ -8,5 +8,6 @@ r2_buckets  = [
 ]
 
 [vars]
-ALLOWED_ORIGINS = "*"
+ALLOWED_ORIGINS = "*" 
+# ALLOWED_ORIGINS = "https://<yoururlhere.com>" # don't forget to include https:// or http://
 CACHE_CONTROL = "public, max-age=86400"
