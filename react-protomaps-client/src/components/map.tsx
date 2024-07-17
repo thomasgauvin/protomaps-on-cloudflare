@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Map from "react-map-gl/maplibre";
 import layers from "protomaps-themes-base";
 
@@ -17,9 +17,9 @@ export const MapComponent = () => {
             protomaps: {
               type: "vector",
               tiles: [
-                "https://pmtiles-cloudflare.tomsprojects.workers.dev/world/{z}/{x}/{y}.mvt",
+                "https://protomaps-on-cloudflare.tomsprojects.workers.dev/world/{z}/{x}/{y}.mvt",
               ],
-              maxzoom: 6
+              maxzoom: 6,
             },
           },
           glyphs:
@@ -27,7 +27,11 @@ export const MapComponent = () => {
           layers: layers("protomaps", "light"),
         }}
         attributionControl={false}
-      />
+      >
+        <div className="bg-opacity-80 backdrop-blur bg-slate-100 text-xs text-center p-2 absolute bottom-0 right-0 rounded-lg m-2">
+          MapLibre | OpenStreetMap contributors | Protomaps
+        </div>
+      </Map>
     </>
   );
 };
