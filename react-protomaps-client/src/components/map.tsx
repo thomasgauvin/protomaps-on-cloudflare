@@ -9,7 +9,7 @@ export const MapComponent = () => {
         initialViewState={{
           longitude: -74.006,
           latitude: 40.7128,
-          zoom: 12,
+          zoom: 9,
         }}
         mapStyle={{
           version: 8,
