@@ -2,7 +2,7 @@ import { MapComponent } from "./components/map";
 
 function App() {
   return (
-    <div style={{ height: '97vh', width: '99vw' /* fix in post */ }}> 
+    <div style={{ height: '100vh' /* fix in post */ }}> 
       <MapComponent />
     </div>
   )

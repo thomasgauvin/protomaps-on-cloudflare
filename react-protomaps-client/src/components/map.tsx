@@ -28,7 +28,15 @@ export const MapComponent = () => {
         }}
         attributionControl={false}
       >
-        <div className="bg-opacity-80 backdrop-blur bg-slate-100 text-xs text-center p-2 absolute bottom-0 right-0 rounded-lg m-2">
+        <div style={{
+          position: "absolute",
+          bottom: 0,
+          left:0,
+          backgroundColor: "white",
+          padding: "5px",
+          borderRadius: "5px",
+          margin: "5px",
+        }}>
           MapLibre | OpenStreetMap contributors | Protomaps
         </div>
       </Map>
