@@ -27,3 +27,7 @@ The Cloudflare Worker code in this repository is copied from the original [PMTil
 ## How the React application works:
 
 The React application uses [React Map GL](https://visgl.github.io/react-map-gl/) and [MapLibre GL JS](https://maplibre.org/maplibre-gl-js-docs/api/) to display the PMTiles files. It makes requests in x/y/z format to the Cloudflare Worker.
+
+### Curious about an exploration of hosting Protomaps statically?
+
+Check out this [exploratory project](https://github.com/thomasgauvin/static-protomaps-on-cloudflare).
